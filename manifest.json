@@ -1,0 +1,8 @@
+{
+    "manifest_version": 3,
+    "name": "Pusherover+",
+    "version": "1.0.0",
+    "default_locale": "en",
+    "description": "Additional featurs for pushover desktop",
+    "author": "Oliver Risager Christensen"
+}
