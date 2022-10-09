@@ -2,7 +2,29 @@
     "manifest_version": 3,
     "name": "Pusherover+",
     "version": "1.0.0",
-    "default_locale": "en",
     "description": "Additional featurs for pushover desktop",
-    "author": "Oliver Risager Christensen"
+    "author": "Oliver Risager Christensen",
+    "permissions": ["alarms", "tts", "ttsEngine"],
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "content_scripts": [
+        {
+          "matches": ["https://client.pushover.net/*"],
+          "js": ["content-script.js"]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "background.service_worker": false
+    },
+    "tts_engine": {
+        "voices": [
+        {
+            "voice_name": "Alice",
+            "lang": "da-DK",
+            "event_types": ["start", "marker", "end"]
+        }
+    ]
+  }
 }
