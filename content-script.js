@@ -1,12 +1,67 @@
 console.log(`    ____             __                                       \r\n   \/ __ \\__  _______\/ \/_  ___  _________ _   _____  _____  __ \r\n  \/ \/_\/ \/ \/ \/ \/ ___\/ __ \\\/ _ \\\/ ___\/ __ \\ | \/ \/ _ \\\/ ___\/_\/ \/_\r\n \/ ____\/ \/_\/ (__  ) \/ \/ \/  __\/ \/  \/ \/_\/ \/ |\/ \/  __\/ \/  \/_  __\/\r\n\/_\/    \\__,_\/____\/_\/ \/_\/\\___\/_\/   \\____\/|___\/\\___\/_\/    \/_\/  `);
 // ####################################################################################
 
-// window.addEventListener ("load", myMain, false);
-
 let msgBefore = '';
 let openedTab = null;
 
-function nodeInsertedCallback(e) {
+let observer = new MutationObserver(mutations => {
+    for(let mutation of mutations) {
+        for(let addedNode of mutation.addedNodes) {
+            if (addedNode.nodeName === "DIV") {
+                if (addedNode.id === 'messages') {
+                    const messages = addedNode;
+                    const newestPush = messages.children[0];
+                    focusNewestPush(newestPush);
+                    ttsNewestPush(newestPush);
+                }
+            }
+        }
+
+        for(let removedNode of mutation.removedNodes) {
+            if (removedNode.nodeName === "DIV") {
+                if (removedNode.id.includes('message_') === true) {
+                    const messages = document.getElementById('messages');
+                    const newestPush = messages.children[0];
+                    focusNewestPush(newestPush);
+                }
+            }
+        }
+     }
+ });
+ observer.observe(document, { childList: true, subtree: true });
+
+
+
+function focusNewestPush(pushElt) {
+    pushElt.click();
+}
+
+function ttsNewestPush(pushElt) {
+    const newestPushContent = pushElt.children[2].children[1];
+    const newestPushMsg = newestPushContent.innerHTML.toString();
+
+    chrome.runtime.sendMessage({
+        toSay: newestPushMsg
+    }, function() {
+        msgBefore = newestPushMsg;
+
+        // if (newestPushHerf !== undefined) {
+        //     if (openedTab !== null) {
+        //         openedTab.close();
+        //     }
+        //     
+        //     const newestPushCord = newestPushHerf.href.split('=')[1].replace('%22', '');
+        //     openMaps(newestPushCord);
+        // }
+
+        return true;
+    });
+}
+
+
+
+
+function myFunc(e) {
     const messagesDiv = document.getElementById('messages');
     const newestPush = messagesDiv.children[0];
 
@@ -23,21 +78,38 @@ function nodeInsertedCallback(e) {
             }, function() {
                 msgBefore = newestPushMsg;
 
-                /*if (newestPushHerf !== undefined) {
-                    if (openedTab !== null) {
-                        openedTab.close();
-                    }
-
-                    const newestPushCord = newestPushHerf.href.split('=')[1].replace('%22', '');
-                    openMaps(newestPushCord);
-                }*/
+                // if (newestPushHerf !== undefined) {
+                //     if (openedTab !== null) {
+                //         openedTab.close();
+                //     }
+                //     
+                //     const newestPushCord = newestPushHerf.href.split('=')[1].replace('%22', '');
+                //     openMaps(newestPushCord);
+                // }
 
                 return true;
             });
         }
     }
 };
-document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
+// document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
+
+/*
+document.addEventListener('DOMSubtreeModified', (e) => {
+    myFunc(e);
+});
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+(async () => {
+    for (let i = 0; i < 5; i++) {
+        const p = document.createElement('p')
+        p.textContent = 'hello'
+        document.body.appendChild(p)
+        await sleep(1000)
+    }
+})();
+*/
 
 
 function openMaps(cord) {
