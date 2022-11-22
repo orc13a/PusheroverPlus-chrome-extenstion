@@ -43,8 +43,10 @@ function ttsNewestPush(pushElt, delay) {
     try {
         //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
         const newestPushMapsLink = newestPushContent.children[0].getAttribute('href')
-        const d = newestPushMapsLink.split('?q=');
-        const cors = d[d.length - 1].replace('"', '');
+        const d = newestPushMapsLink.split('maps?q=');
+        console.log(newestPushMapsLink);
+        console.log(d);
+        const cors = d[1].replace('"', '');
 
         embedMaps(cors);
     } catch (error) {
@@ -55,11 +57,11 @@ function ttsNewestPush(pushElt, delay) {
     // PF
     try {
         //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
-        const newestPushMapsLink = newestPushContent.children[newestPushContent.childElementCount - 1].getAttribute('href')
-        const d = newestPushMapsLink.split('&query=');
-        const cors = d[d.length - 1].replace('"', '');
+        const newestPushMapsLink2 = newestPushContent.children[newestPushContent.childElementCount - 1].getAttribute('href')
+        const d2 = newestPushMapsLink2.split('&query=');
+        const cors2 = d[d2.length - 1].replace('"', '');
 
-        embedMaps(cors);
+        embedMaps(cors2);
     } catch (error) {
         console.error('Kunne ikke vise Google Maps');
         console.error(error);
@@ -161,8 +163,8 @@ function embedMaps(destinationCors) {
     bigMessageContainer.appendChild(mapsContainer);
 
     const iframeMaps = document.createElement('iframe');
-    iframeMaps.setAttribute('width', '375px');
-    iframeMaps.setAttribute('height', '450px');
+    iframeMaps.setAttribute('width', '100%'); // 375
+    iframeMaps.setAttribute('height', '450px'); // 450
     iframeMaps.setAttribute('style', 'border:0px;');
     iframeMaps.setAttribute('loading', 'lazy');
     iframeMaps.setAttribute('allowfullscreen', '');
