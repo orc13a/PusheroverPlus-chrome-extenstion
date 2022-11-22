@@ -34,12 +34,22 @@ let observer = new MutationObserver(mutations => {
 
 function focusNewestPush(pushElt) {
     pushElt.click();
-    embedMaps();
 }
 
 function ttsNewestPush(pushElt, delay) {
     const newestPushContent = pushElt.children[2].children[1];
     const newestPushMsg = newestPushContent.innerHTML.toString().split('RSE_')[0].replace('FUH', 'færdselsuheld').replace('Min.', 'mindre').replace('MTV', 'motervejen...');
+
+    try {
+        //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
+        const newestPushMapsLink = newestPushContent.children[0].getAttribute('href')
+        const dCors = newestPushMapsLink.split('?q=')[1].replace('"', '');
+
+        embedMaps(dCors);
+    } catch (error) {
+        console.error('Kunne ikke vise Google Maps');
+        console.error(error);
+    }
 
     setTimeout(() => {
         chrome.runtime.sendMessage({
@@ -121,7 +131,7 @@ function openMaps(cord) {
     openedTab = open(`https://www.google.dk/maps/dir/Karen+Schacks+Vej+42,+2800+Kongens+Lyngby/${cord}/@55.7337835,12.3728096,12z/data=!3m1!4b1!4m8!4m7!1m5!1m1!1s0x46524e7776ee07f3:0x40b47e6cd531d689!2m2!1d12.5276465!2d55.7756502!1m0`, 'test', params);
 }
 
-function embedMaps() {
+function embedMaps(destinationCors) {
     const bigMessageContainer = document.getElementById('big_message');
 
     try {
@@ -144,6 +154,6 @@ function embedMaps() {
     iframeMaps.setAttribute('allowfullscreen', '');
     iframeMaps.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
     iframeMaps.setAttribute('src', 
-    `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=Telemark+Norway`);
+    `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
     mapsContainer.appendChild(iframeMaps);
 }
