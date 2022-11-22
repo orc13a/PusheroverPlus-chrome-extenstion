@@ -38,14 +38,28 @@ function focusNewestPush(pushElt) {
 
 function ttsNewestPush(pushElt, delay) {
     const newestPushContent = pushElt.children[2].children[1];
-    const newestPushMsg = newestPushContent.innerHTML.toString().split('RSE_')[0].replace('FUH', 'færdselsuheld').replace('Min.', 'mindre').replace('MTV', 'motervejen...');
+    const newestPushMsg = newestPushContent.innerHTML.toString().split('RSE_')[0].replace('<br>', '').replace('FUH', 'færdselsuheld').replace('Min.', 'mindre').replace('MTV', 'motervejen...');
 
     try {
         //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
         const newestPushMapsLink = newestPushContent.children[0].getAttribute('href')
-        const dCors = newestPushMapsLink.split('?q=')[1].replace('"', '');
+        const d = newestPushMapsLink.split('?q=');
+        const cors = d[d.length - 1].replace('"', '');
 
-        embedMaps(dCors);
+        embedMaps(cors);
+    } catch (error) {
+        console.error('Kunne ikke vise Google Maps');
+        console.error(error);
+    }
+
+    // PF
+    try {
+        //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
+        const newestPushMapsLink = newestPushContent.children[newestPushContent.childElementCount - 1].getAttribute('href')
+        const d = newestPushMapsLink.split('&query=');
+        const cors = d[d.length - 1].replace('"', '');
+
+        embedMaps(cors);
     } catch (error) {
         console.error('Kunne ikke vise Google Maps');
         console.error(error);
@@ -148,7 +162,7 @@ function embedMaps(destinationCors) {
 
     const iframeMaps = document.createElement('iframe');
     iframeMaps.setAttribute('width', '375px');
-    iframeMaps.setAttribute('height', '375px');
+    iframeMaps.setAttribute('height', '450px');
     iframeMaps.setAttribute('style', 'border:0px;');
     iframeMaps.setAttribute('loading', 'lazy');
     iframeMaps.setAttribute('allowfullscreen', '');
