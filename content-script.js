@@ -71,11 +71,10 @@ const getFocusMessage = () => {
 const showGoogleMaps = (destinationCors) => {
     const bigMessageContainer = document.getElementById('big_message');
 
-    try {
-        const mapsContainer = document.getElementById('p_plus-embeded-maps');
-        bigMessageContainer.removeChild(mapsContainer);
-    } catch (error) {
-        console.error('Intet map at fjerne...');
+    const checkMapsContainer = document.getElementById('p_plus-embeded-maps');
+
+    if (checkMapsContainer !== null) {
+        bigMessageContainer.removeChild(checkMapsContainer);
     }
 
     const mapsContainer = document.createElement('div');
@@ -93,6 +92,8 @@ const showGoogleMaps = (destinationCors) => {
     iframeMaps.setAttribute('src', 
     `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
     mapsContainer.appendChild(iframeMaps);
+
+    console.log(`https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
 }
 
 
