@@ -1,6 +1,9 @@
 console.log(`    ____             __                                       \r\n   \/ __ \\__  _______\/ \/_  ___  _________ _   _____  _____  __ \r\n  \/ \/_\/ \/ \/ \/ \/ ___\/ __ \\\/ _ \\\/ ___\/ __ \\ | \/ \/ _ \\\/ ___\/_\/ \/_\r\n \/ ____\/ \/_\/ (__  ) \/ \/ \/  __\/ \/  \/ \/_\/ \/ |\/ \/  __\/ \/  \/_  __\/\r\n\/_\/    \\__,_\/____\/_\/ \/_\/\\___\/_\/   \\____\/|___\/\\___\/_\/    \/_\/  `);
 // ####################################################################################
 
+
+
+/*
 let msgBefore = '';
 let openedTab = null;
 
@@ -123,7 +126,7 @@ function myFunc(e) {
 };
 // document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 
-/*
+
 document.addEventListener('DOMSubtreeModified', (e) => {
     myFunc(e);
 });
@@ -138,7 +141,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         await sleep(1000)
     }
 })();
-*/
+
 
 
 function openMaps(cord) {
@@ -173,3 +176,4 @@ function embedMaps(destinationCors) {
     `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
     mapsContainer.appendChild(iframeMaps);
 }
+*/
