@@ -4,6 +4,14 @@ console.log(`    ____             __                                       \r\n 
 let msgBefore = '';
 let openedTab = null;
 
+// document.addEventListener("DOMContentLoaded", function(){
+    const body = document.getElementsByTagName('body')[0];
+    const scriptTag = document.createElement('script');
+    scriptTag.setAttribute('src', 'https://code.responsivevoice.org/responsivevoice.js?key=XL1fv6XM');
+    body.appendChild(scriptTag);
+// }, false);
+
+/*
 let observer = new MutationObserver(mutations => {
     for(let mutation of mutations) {
         for(let addedNode of mutation.addedNodes) {
@@ -12,7 +20,7 @@ let observer = new MutationObserver(mutations => {
                     const messages = addedNode;
                     const newestPush = messages.children[0];
                     focusNewestPush(newestPush);
-                    ttsNewestPush(newestPush, 1000);
+                    //ttsNewestPush(newestPush, 1000);
                 }
             }
         }
@@ -35,6 +43,7 @@ let observer = new MutationObserver(mutations => {
 function focusNewestPush(pushElt) {
     pushElt.click();
 }
+
 
 function ttsNewestPush(pushElt, delay) {
     const newestPushContent = pushElt.children[2].children[1];
@@ -123,7 +132,7 @@ function myFunc(e) {
 };
 // document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
 
-/*
+
 document.addEventListener('DOMSubtreeModified', (e) => {
     myFunc(e);
 });
@@ -138,7 +147,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
         await sleep(1000)
     }
 })();
-*/
+
 
 
 function openMaps(cord) {
@@ -173,3 +182,5 @@ function embedMaps(destinationCors) {
     `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
     mapsContainer.appendChild(iframeMaps);
 }
+
+*/
