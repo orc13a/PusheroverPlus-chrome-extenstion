@@ -1,4 +1,3 @@
-/*
 chrome.runtime.onMessage.addListener(function(request) {
     chrome.tts.speak(request.toSay, { 
         rate: 0.8,
@@ -10,4 +9,3 @@ chrome.runtime.onMessage.addListener(function(request) {
         return true;
     });
 });
-*/

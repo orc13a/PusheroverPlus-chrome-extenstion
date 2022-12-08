@@ -14,9 +14,11 @@ let messagesObserver = new MutationObserver(mutations => {
                         if (isMessagePfTrafik() === true) {
                             const messageInfo = getFocusPfTrafikMessage();
                             showGoogleMaps(messageInfo.cors);
+                            ttsMessage(messageInfo.message);
                         } else {
                             const messageInfo = getFocusMessage();
                             showGoogleMaps(messageInfo.cors);
+                            ttsMessage(messageInfo.message.split('RSE_')[0]);
                         }
                     }, 1000);
                 }
@@ -39,10 +41,6 @@ const isMessagePfTrafik = () => {
         return false;
     }
 }
-
-// ########################################
-// Google Maps
-// ########################################
 
 const getFocusPfTrafikMessage = () => {
     const big_message_message = document.getElementById('big_message_message');
@@ -67,6 +65,20 @@ const getFocusMessage = () => {
         cors: cors
     }
 }
+
+const ttsMessage = (pushMessage) => {
+    setTimeout(() => {
+        chrome.runtime.sendMessage({
+            toSay: pushMessage
+        }, function() {
+            return true;
+        });
+    }, 2000);
+}
+ 
+// ########################################
+// Google Maps
+// ########################################
 
 const showGoogleMaps = (destinationCors) => {
     const bigMessageContainer = document.getElementById('big_message');
