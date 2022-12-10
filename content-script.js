@@ -118,17 +118,26 @@ const showGoogleMaps = (destinationCors) => {
         bigMessageContainer.appendChild(mapsContainer);
 
         const iframeMaps = document.createElement('iframe');
+        iframeMaps.setAttribute('id', 'p_plus-embeded-maps-iframe')
         iframeMaps.setAttribute('width', '100%'); // 375
         iframeMaps.setAttribute('height', '450px'); // 450
         iframeMaps.setAttribute('style', 'border:0px;');
         iframeMaps.setAttribute('loading', 'lazy');
         iframeMaps.setAttribute('allowfullscreen', '');
         iframeMaps.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-        iframeMaps.setAttribute('src',
-            `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
+
+        const mapsUrl = `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`;
+
+        iframeMaps.setAttribute('src', mapsUrl);
         mapsContainer.appendChild(iframeMaps);
 
-        console.log(`https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
+        const im = document.getElementById('p_plus-embeded-maps-iframe');
+
+        try {
+            im.setAttribute('src', im.getAttribute('src').replace('&output', ''));
+        } catch (error) {
+            
+        }
     } else {
         console.error('Kunne ikke vise Google Maps, da der ingen koordinater er.');
     }
