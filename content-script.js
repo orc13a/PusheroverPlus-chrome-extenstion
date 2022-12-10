@@ -134,7 +134,7 @@ const showGoogleMaps = (destinationCors) => {
         const im = document.getElementById('p_plus-embeded-maps-iframe');
 
         try {
-            im.setAttribute('src', im.getAttribute('src').replace('&output', ''));
+            im.setAttribute('src', im.getAttribute('src').split('&output')[0]);
         } catch (error) {
             
         }
