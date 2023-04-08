@@ -1,186 +1,155 @@
 console.log(`    ____             __                                       \r\n   \/ __ \\__  _______\/ \/_  ___  _________ _   _____  _____  __ \r\n  \/ \/_\/ \/ \/ \/ \/ ___\/ __ \\\/ _ \\\/ ___\/ __ \\ | \/ \/ _ \\\/ ___\/_\/ \/_\r\n \/ ____\/ \/_\/ (__  ) \/ \/ \/  __\/ \/  \/ \/_\/ \/ |\/ \/  __\/ \/  \/_  __\/\r\n\/_\/    \\__,_\/____\/_\/ \/_\/\\___\/_\/   \\____\/|___\/\\___\/_\/    \/_\/  `);
+console.log('v1.2.0');
 // ####################################################################################
 
-let msgBefore = '';
-let openedTab = null;
+// ########################################
+// Pushover UI
+// ########################################
 
-// document.addEventListener("DOMContentLoaded", function(){
-    const body = document.getElementsByTagName('body')[0];
-    const scriptTag = document.createElement('script');
-    scriptTag.setAttribute('src', 'https://code.responsivevoice.org/responsivevoice.js?key=XL1fv6XM');
-    body.appendChild(scriptTag);
-// }, false);
 
-/*
-let observer = new MutationObserver(mutations => {
-    for(let mutation of mutations) {
-        for(let addedNode of mutation.addedNodes) {
+
+// ########################################
+// Push focus and tts
+// ########################################
+
+let messagesObserver = new MutationObserver(mutations => {
+    for (let mutation of mutations) {
+        for (const addedNode of mutation.addedNodes) {
             if (addedNode.nodeName === "DIV") {
                 if (addedNode.id === 'messages') {
                     const messages = addedNode;
                     const newestPush = messages.children[0];
                     focusNewestPush(newestPush);
-                    //ttsNewestPush(newestPush, 1000);
+
+                    setTimeout(() => {
+                        if (isMessagePfTrafik() === true) {
+                            const messageInfo = getFocusPfTrafikMessage();
+                            showGoogleMaps(messageInfo.cors);
+                            ttsMessage(messageInfo.message);
+                        } else {
+                            const messageInfo = getFocusMessage();
+                            showGoogleMaps(messageInfo.cors);
+                            const newMessage = translateMessage(messageInfo.message);
+                            ttsMessage(newMessage);
+                        }
+                    }, 1000);
                 }
             }
         }
+    }
+});
+messagesObserver.observe(document, { childList: true, subtree: true });
 
-        for(let removedNode of mutation.removedNodes) {
-            if (removedNode.nodeName === "DIV") {
-                if (removedNode.id.includes('message_') === true) {
-                    const messages = document.getElementById('messages');
-                    const newestPush = messages.children[0];
-                    focusNewestPush(newestPush);
-                }
-            }
-        }
-     }
- });
- observer.observe(document, { childList: true, subtree: true });
-
-
-
-function focusNewestPush(pushElt) {
+const focusNewestPush = (pushElt) => {
     pushElt.click();
 }
 
-
-function ttsNewestPush(pushElt, delay) {
-    const newestPushContent = pushElt.children[2].children[1];
-    const newestPushMsg = newestPushContent.innerHTML.toString().split('RSE_')[0].replace('<br>', '').replace('FUH', 'færdselsuheld').replace('Min.', 'mindre').replace('MTV', 'motervejen...');
+const translateMessage = (message) => {
+    let newMsg = message.split('RSE_')[0];
 
     try {
-        //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
-        const newestPushMapsLink = newestPushContent.children[0].getAttribute('href')
-        const d = newestPushMapsLink.split('maps?q=');
-        console.log(newestPushMapsLink);
-        console.log(d);
-        const cors = d[1].replace('"', '');
+        const ssFirstS = newMsg.split('#SS');
+        const ssSecoundS = ssFirstS[1].split('#');
 
-        embedMaps(cors);
+        newMsg = ssFirstS[0] + '... ' + ssSecoundS[1];
     } catch (error) {
-        console.error('Kunne ikke vise Google Maps');
-        console.error(error);
-    }
 
-    // PF
+    }
+    
+    return newMsg;
+}
+
+const isMessagePfTrafik = () => {
+    const big_message_title = document.getElementById('big_message_title');
+
+    if (big_message_title.innerText.includes('PF Trafik')) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+const getFocusPfTrafikMessage = () => {
+    const big_message_message = document.getElementById('big_message_message');
+    const mapsLink = big_message_message.children[big_message_message.childElementCount - 1];
+    const cors = mapsLink.getAttribute('href').split('&query=')[1];
+    big_message_message.removeChild(mapsLink);
+
+    return {
+        message: big_message_message.innerText,
+        cors: cors
+    }
+}
+
+const getFocusMessage = () => {
+    const big_message_message = document.getElementById('big_message_message');
+    const mapsLink = big_message_message.children[big_message_message.childElementCount - 1];
+    let cors = undefined;
+
     try {
-        //const newestPushMapsLink = newestPushContent.getElementsByTagName('<a>')[0];
-        const newestPushMapsLink2 = newestPushContent.children[newestPushContent.childElementCount - 1].getAttribute('href')
-        const d2 = newestPushMapsLink2.split('&query=');
-        const cors2 = d[d2.length - 1].replace('"', '');
-
-        embedMaps(cors2);
+        cors = mapsLink.getAttribute('href').split('maps?q=')[1].replace('"', '')
     } catch (error) {
-        console.error('Kunne ikke vise Google Maps');
-        console.error(error);
+        console.error('Kunne ikke finde nogen koordinater');
     }
 
+
+    return {
+        message: big_message_message.innerText,
+        cors: cors
+    }
+}
+
+const ttsMessage = (pushMessage) => {
     setTimeout(() => {
         chrome.runtime.sendMessage({
-            toSay: newestPushMsg
-        }, function() {
-            msgBefore = newestPushMsg;
-    
-            // if (newestPushHerf !== undefined) {
-            //     if (openedTab !== null) {
-            //         openedTab.close();
-            //     }
-            //     
-            //     const newestPushCord = newestPushHerf.href.split('=')[1].replace('%22', '');
-            //     openMaps(newestPushCord);
-            // }
-    
+            toSay: pushMessage
+        }, function () {
             return true;
         });
-    }, delay);
+    }, 2000);
 }
 
+// ########################################
+// Google Maps
+// ########################################
 
+const showGoogleMaps = (destinationCors) => {
+    if (destinationCors !== null) {
+        const bigMessageContainer = document.getElementById('big_message');
 
+        const checkMapsContainer = document.getElementById('p_plus-embeded-maps');
 
-function myFunc(e) {
-    const messagesDiv = document.getElementById('messages');
-    const newestPush = messagesDiv.children[0];
-
-    if (newestPush !== undefined) {
-        newestPush.click();
-
-        const newestPushContent = newestPush.children[2].children[1];
-        const newestPushMsg = newestPushContent.innerHTML.toString();
-        const newestPushHerf = newestPushContent.children[0];
-        
-        if (msgBefore !== newestPushMsg) {
-            chrome.runtime.sendMessage({
-                toSay: newestPushMsg
-            }, function() {
-                msgBefore = newestPushMsg;
-
-                // if (newestPushHerf !== undefined) {
-                //     if (openedTab !== null) {
-                //         openedTab.close();
-                //     }
-                //     
-                //     const newestPushCord = newestPushHerf.href.split('=')[1].replace('%22', '');
-                //     openMaps(newestPushCord);
-                // }
-
-                return true;
-            });
+        if (checkMapsContainer !== null) {
+            bigMessageContainer.removeChild(checkMapsContainer);
         }
+
+        const mapsContainer = document.createElement('div');
+        mapsContainer.setAttribute('id', 'p_plus-embeded-maps');
+        mapsContainer.setAttribute('style', 'width: 100%; height: 375px;');
+        bigMessageContainer.appendChild(mapsContainer);
+
+        const iframeMaps = document.createElement('iframe');
+        iframeMaps.setAttribute('id', 'p_plus-embeded-maps-iframe')
+        iframeMaps.setAttribute('width', '100%'); // 375
+        iframeMaps.setAttribute('height', '450px'); // 450
+        iframeMaps.setAttribute('style', 'border:0px;');
+        iframeMaps.setAttribute('loading', 'lazy');
+        iframeMaps.setAttribute('allowfullscreen', '');
+        iframeMaps.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+
+        const mapsUrl = `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`;
+
+        iframeMaps.setAttribute('src', mapsUrl);
+        mapsContainer.appendChild(iframeMaps);
+
+        const im = document.getElementById('p_plus-embeded-maps-iframe');
+
+        try {
+            im.setAttribute('src', im.getAttribute('src').split('&output')[0]);
+        } catch (error) {
+
+        }
+    } else {
+        console.error('Kunne ikke vise Google Maps, da der ingen koordinater er.');
     }
-};
-// document.addEventListener('DOMNodeInserted', nodeInsertedCallback);
-
-
-document.addEventListener('DOMSubtreeModified', (e) => {
-    myFunc(e);
-});
-
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
-
-(async () => {
-    for (let i = 0; i < 5; i++) {
-        const p = document.createElement('p')
-        p.textContent = 'hello'
-        document.body.appendChild(p)
-        await sleep(1000)
-    }
-})();
-
-
-
-function openMaps(cord) {
-    let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,width=1000,height=800,left=50,top=500`;
-
-    openedTab = open(`https://www.google.dk/maps/dir/Karen+Schacks+Vej+42,+2800+Kongens+Lyngby/${cord}/@55.7337835,12.3728096,12z/data=!3m1!4b1!4m8!4m7!1m5!1m1!1s0x46524e7776ee07f3:0x40b47e6cd531d689!2m2!1d12.5276465!2d55.7756502!1m0`, 'test', params);
 }
-
-function embedMaps(destinationCors) {
-    const bigMessageContainer = document.getElementById('big_message');
-
-    try {
-        const mapsContainer = document.getElementById('p_plus-embeded-maps');
-        mapsContainer.remove();
-    } catch (error) {
-        console.error(error);
-    }
-
-    const mapsContainer = document.createElement('div');
-    mapsContainer.setAttribute('id', 'p_plus-embeded-maps');
-    mapsContainer.setAttribute('style', 'width: 100%; height: 375px;');
-    bigMessageContainer.appendChild(mapsContainer);
-
-    const iframeMaps = document.createElement('iframe');
-    iframeMaps.setAttribute('width', '100%'); // 375
-    iframeMaps.setAttribute('height', '450px'); // 450
-    iframeMaps.setAttribute('style', 'border:0px;');
-    iframeMaps.setAttribute('loading', 'lazy');
-    iframeMaps.setAttribute('allowfullscreen', '');
-    iframeMaps.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
-    iframeMaps.setAttribute('src', 
-    `https://www.google.com/maps/embed/v1/directions?key=AIzaSyAF1E4kdwZVswl1rsHwKUjimojtXi-Bxp4&origin=place_id:ChIJ6WzacndOUkYR0_ozzT-vnyc&destination=${destinationCors}`);
-    mapsContainer.appendChild(iframeMaps);
-}
-
-*/
